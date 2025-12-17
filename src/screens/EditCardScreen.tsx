@@ -51,12 +51,10 @@ export default function EditCardScreen({route, navigation}: Props) {
     }
 
     const requiredItems = size * size;
-    if (itemList.length < requiredItems) {
-      Alert.alert(
-        'Error',
-        `You need at least ${requiredItems} items for a ${size}x${size} card. You have ${itemList.length}.`,
-      );
-      return;
+    // Fill with empty strings if not enough items
+    const finalItems = [...itemList];
+    while (finalItems.length < requiredItems) {
+      finalItems.push('');
     }
 
     const card = await getCardById(cardId);
@@ -65,7 +63,7 @@ export default function EditCardScreen({route, navigation}: Props) {
     const updatedCard = {
       ...card,
       title: trimmedTitle,
-      items: itemList.slice(0, requiredItems),
+      items: finalItems.slice(0, requiredItems),
       size,
       crossedItems: size !== originalSize ? [] : card.crossedItems,
     };
@@ -81,7 +79,7 @@ export default function EditCardScreen({route, navigation}: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <Text style={styles.label}>Card Title</Text>
         <TextInput
           style={styles.titleInput}
@@ -151,6 +149,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+  },
+  contentContainer: {
+    paddingBottom: 100,
   },
   label: {
     fontSize: 16,
