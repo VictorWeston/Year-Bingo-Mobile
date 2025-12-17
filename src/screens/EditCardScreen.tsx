@@ -5,10 +5,12 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../types';
 import {getCardById, saveCard} from '../store/CardStore';
@@ -18,6 +20,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'EditCard'>;
 const SIZES = [3, 4, 5];
 
 export default function EditCardScreen({route, navigation}: Props) {
+  const insets = useSafeAreaInsets();
   const {cardId} = route.params;
   const [title, setTitle] = useState('');
   const [items, setItems] = useState('');
@@ -78,8 +81,14 @@ export default function EditCardScreen({route, navigation}: Props) {
     .filter(item => item.trim().length > 0).length;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+      <ScrollView 
+        style={styles.content} 
+        contentContainerStyle={styles.contentContainer}
+        keyboardShouldPersistTaps="handled">
         <Text style={styles.label}>Card Title</Text>
         <TextInput
           style={styles.titleInput}
@@ -127,7 +136,7 @@ export default function EditCardScreen({route, navigation}: Props) {
         />
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, {paddingBottom: Math.max(insets.bottom, 20)}]}>
         <TouchableOpacity
           style={styles.cancelButton}
           onPress={() => navigation.goBack()}>
@@ -137,7 +146,7 @@ export default function EditCardScreen({route, navigation}: Props) {
           <Text style={styles.saveButtonText}>Save Changes</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 

@@ -4,10 +4,10 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Dimensions,
   Alert,
 } from 'react-native';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useFocusEffect} from '@react-navigation/native';
 import {RootStackParamList, BingoCard} from '../types';
@@ -18,6 +18,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'CardViewer'>;
 const {width} = Dimensions.get('window');
 
 export default function CardViewerScreen({route, navigation}: Props) {
+  const insets = useSafeAreaInsets();
   const {cardId} = route.params;
   const [card, setCard] = useState<BingoCard | null>(null);
 
@@ -138,7 +139,7 @@ export default function CardViewerScreen({route, navigation}: Props) {
         </View>
       </View>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, {paddingBottom: Math.max(insets.bottom, 20)}]}>
         <TouchableOpacity style={styles.actionButton} onPress={handleShuffle}>
           <Text style={styles.actionButtonText}>Shuffle</Text>
         </TouchableOpacity>
