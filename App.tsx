@@ -6,6 +6,7 @@ import {RootStackParamList} from './src/types';
 import HomeScreen from './src/screens/HomeScreen';
 import CreateCardScreen from './src/screens/CreateCardScreen';
 import CardViewerScreen from './src/screens/CardViewerScreen';
+import EditCardScreen from './src/screens/EditCardScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -38,6 +39,11 @@ function App() {
           name="CardViewer"
           component={CardViewerScreen}
           options={{title: 'Bingo Card'}}
+        />
+        <Stack.Screen
+          name="EditCard"
+          component={EditCardScreen}
+          options={{title: 'Edit Card'}}
         />
       </Stack.Navigator>
     </NavigationContainer>

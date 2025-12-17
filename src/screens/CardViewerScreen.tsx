@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useFocusEffect} from '@react-navigation/native';
 import {RootStackParamList, BingoCard} from '../types';
 import {getCardById, saveCard, deleteCard} from '../store/CardStore';
 
@@ -20,9 +21,11 @@ export default function CardViewerScreen({route, navigation}: Props) {
   const {cardId} = route.params;
   const [card, setCard] = useState<BingoCard | null>(null);
 
-  useEffect(() => {
-    loadCard();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadCard();
+    }, []),
+  );
 
   const loadCard = async () => {
     const loadedCard = await getCardById(cardId);
@@ -77,6 +80,19 @@ export default function CardViewerScreen({route, navigation}: Props) {
     ]);
   };
 
+  const handleShuffle = async () => {
+    if (!card) return;
+    const shuffledItems = [...card.items].sort(() => Math.random() - 0.5);
+    const updatedCard = {...card, items: shuffledItems, crossedItems: []};
+    setCard(updatedCard);
+    await saveCard(updatedCard);
+  };
+
+  const handleEdit = () => {
+    if (!card) return;
+    navigation.navigate('EditCard', {cardId: card.id});
+  };
+
   if (!card) {
     return (
       <SafeAreaView style={styles.container}>
@@ -123,6 +139,12 @@ export default function CardViewerScreen({route, navigation}: Props) {
       </View>
 
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.actionButton} onPress={handleShuffle}>
+          <Text style={styles.actionButtonText}>Shuffle</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={handleEdit}>
+          <Text style={styles.actionButtonText}>Edit</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
           <Text style={styles.resetButtonText}>Reset</Text>
         </TouchableOpacity>
@@ -197,30 +219,43 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     padding: 20,
-    gap: 12,
+    gap: 10,
+  },
+  actionButton: {
+    width: '48%',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    backgroundColor: '#e3f2fd',
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1976d2',
   },
   resetButton: {
-    flex: 1,
-    padding: 16,
+    width: '48%',
+    padding: 14,
     borderRadius: 8,
     alignItems: 'center',
     backgroundColor: '#e0e0e0',
   },
   resetButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#666',
   },
   deleteButton: {
-    flex: 1,
-    padding: 16,
+    width: '48%',
+    padding: 14,
     borderRadius: 8,
     alignItems: 'center',
     backgroundColor: '#ffebee',
   },
   deleteButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#d32f2f',
   },

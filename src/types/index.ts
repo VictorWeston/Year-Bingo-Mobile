@@ -11,4 +11,5 @@ export type RootStackParamList = {
   Home: undefined;
   CreateCard: undefined;
   CardViewer: {cardId: string};
+  EditCard: {cardId: string};
 };
